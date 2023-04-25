@@ -35,6 +35,6 @@ public class Note {
     }
 
     public String toString() {
-        return "" + this.note + "Coef" + this.coefficient;
+        return "" + this.note + " Coef" + this.coefficient;
     }
 }
