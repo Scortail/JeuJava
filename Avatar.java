@@ -54,7 +54,9 @@ public class Avatar {
         listeDefi.add(new Defi(this, avatarDefier, listeQuestions));
         avatarDefier.getListeDefi().add(new Defi(this, avatarDefier, listeQuestions));
     }
-
-
-
+   
+    public String toString(){
+        return"Pseudo: "+ this.pseudo + "Etudiant: " + this.etudiant +"Life: "+ this.life;
+    }
+   
 }
