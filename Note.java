@@ -1,8 +1,16 @@
 public class Note {
-    private int note;
-    private int coefficient;
+    private double note;
+    private double coefficient;
 
-    public Note(int note, int coefficient) {
+    class WrongNoteException extends Exception{
+
+        public String toString(){
+            return "Erreur: La note n'est pas compris entre 0 et 20.";
+        }
+
+    }
+
+    public Note(double note, double coefficient) {
         if (coefficient <= 0) {
             this.coefficient = 1;
             System.out.println("Coefficient nul ou négatif, le coefficient a était modifier par 1");
@@ -13,24 +21,24 @@ public class Note {
         this.note = note;
     }
 
-    public Note(int note) {
+    public Note(double note) {
         this.note = note;
         this.coefficient = 1;
     }
 
-    public int getNote() {
+    public double getNote() {
         return note;
     }
 
-    public int getCoefficient() {
+    public double getCoefficient() {
         return coefficient;
     }
 
-    public void setNote(int note) {
+    public void setNote(double note) {
         this.note = note;
     }
 
-    public void setCoefficient(int coefficient) {
+    public void setCoefficient(double coefficient) {
         this.coefficient = coefficient;
     }
 

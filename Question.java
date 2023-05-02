@@ -3,14 +3,14 @@ import java.util.ArrayList;
 // import java.util.Scanner;
 
 public class Question {
-    private String question;
-    private ArrayList<String> listeReponse;
+    private String intitule;
+    private ArrayList<String> choixQuestion;
     private int nbPoints;
     private String reponseValide;
 
-    public Question(String question, ArrayList<String> listeReponse, int nbPoints, String reponseValide) {
-        this.question = question;
-        this.listeReponse = listeReponse;
+    public Question(String intitule, ArrayList<String> choixQuestion, int nbPoints, String reponseValide) {
+        this.intitule = intitule;
+        this.choixQuestion = choixQuestion;
         this.nbPoints = nbPoints;
         this.reponseValide = reponseValide;
 
@@ -22,7 +22,7 @@ public class Question {
         //     System.out.println("Entrez un mot pour ajouter une reponse a la question puis taper entrez ou entrez ok apres avoir mis a moins 2 reponses différentes! ");
 
         //     String reponse = choixReponse.nextLine();  // Read user input
-        //     if (reponse == "ok" && listeReponse.size() > 1) {
+        //     if (reponse == "ok" && choixQuestion.size() > 1) {
 
         //     }
 
@@ -31,12 +31,12 @@ public class Question {
 
     }
 
-    public String getQuestion() {
-        return question;
+    public String getIntitule() {
+        return intitule;
     }
 
-    public ArrayList<String> getListeReponse() {
-        return listeReponse;
+    public ArrayList<String> getChoixReponse() {
+        return choixQuestion;
     }
 
     public int getNbPoints() {
@@ -47,20 +47,33 @@ public class Question {
         return reponseValide;
     }
 
-    public void setQuestion(String question) {
-        this.question = question;
+    public void setIntitule(String intitule) {
+        this.intitule = intitule;
     }
 
     public void setNbPoints(int nbPoints) {
         this.nbPoints = nbPoints;
     }
 
-    public void setreponseValide(String reponseValide) {
+    public void setReponseValide(String reponseValide) {
         this.reponseValide = reponseValide;
     }
 
+    public boolean verifReponse(String reponse) {
+        if (reponse.equals(reponseValide)) {
+            return true;
+        }
+        return false;
+    }
 
     public String toString() {
-        return "Question : " + this.question + "Choix : " + this.listeReponse + " Nb Point: " + this.nbPoints + " Reponse : " + this.reponseValide;
+        return "Question : " + this.intitule + "Choix : " + this.choixQuestion + " Nb Point: " + this.nbPoints + " Reponse : " + this.reponseValide;
+    }
+
+    public boolean equals(Question question) {
+        if (this.intitule == question.intitule && this.choixQuestion == question.choixQuestion && this.nbPoints == question.nbPoints && this.reponseValide == question.reponseValide) {
+            return true;
+        }
+        return false;
     }
 }
