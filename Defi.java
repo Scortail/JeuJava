@@ -1,4 +1,4 @@
-import java.util.ArrayList;
+import java.util.*;
 // Lors dun defi les joueur senvoi des question 
 // a tour de role on pose une question, on a loption arreter defi regle a definir exemple: meme nb de question chacun ? des quun arrete, tout sarrete ou il faut le meme nb de question repondu
 
@@ -6,13 +6,17 @@ public class Defi {
     private Avatar joueur1;
     private Avatar joueur2;
     private int etat; // -1 : refusé, 0 : en attente, 1 : accepté
-    private ArrayList<Question> listeQuestions;
+    private ArrayList<Question> listeQuestionsJoueur1;
+    private ArrayList<Question> listeQuestionsJoueur2;
+
+
 
     public Defi(Avatar joueur1, Avatar joueur2) {
         this.joueur1 = joueur1;
         this.joueur2 = joueur2;
         this.etat = 0;
-        this.listeQuestions = new ArrayList<Question>();
+        this.listeQuestionsJoueur1 = new ArrayList<Question>();
+        this.listeQuestionsJoueur2 = new ArrayList<Question>();
     }
 
     public Avatar getJoueur1() {
@@ -27,6 +31,14 @@ public class Defi {
         return this.etat;
     }
 
+    public ArrayList<Question> getListeQuestionsJoueur1() {
+        return this.listeQuestionsJoueur1;
+    }
+
+    public ArrayList<Question> getListeQuestionsJoueur2() {
+        return this.listeQuestionsJoueur2;
+    }
+
     public void setJoueur1(Avatar joueur1) {
         this.joueur1 = joueur1;
     }
@@ -39,23 +51,80 @@ public class Defi {
         this.etat = etat;
     }
     
-    public ArrayList<Question> getListeQuestions() {
-        return this.listeQuestions;
-    }
+    class WrongChoiceQuestion extends Exception{
 
-    public void ajouterQuestion(Question question) {
-        this.listeQuestions.add(question);
-    }
-
-    public void refuserDefi(Avatar avatar) {
-        if (avatar.getPseudo().equals(joueur2.getPseudo())) {
-            this.etat = -1;
-            System.out.println("Le défi a été refusé par " + joueur2.getPseudo());
-        } else {
-            System.out.println("Vous ne pouvez pas refusé ce défi car vous n'êtes pas le joueur défié.");
+        public String toString(){
+            return "Erreur: Ce n'est pas une réponse possible";
         }
     }
+    
 
+    public String getJoueurReponse(Question question) throws WrongChoiceQuestion{
+        Scanner sc = new Scanner(System.in) ;
+
+        System.out.println("Votre réponse : ");
+        String reponse = sc.nextLine();
+
+
+        if (!question.getChoixReponse().contains(reponse))
+            throw new WrongChoiceQuestion();
+        return reponse;
+    }
+
+
+    public void ajouterQuestionJoueur1(Question question) {
+        this.listeQuestionsJoueur1.add(question);
+    }
+
+    public void ajouterQuestionJoueur2(Question question) {
+        this.listeQuestionsJoueur2.add(question);
+    }
+
+    public void repondreQuestion(Question question, Avatar joueur) {
+        String reponse = null;
+
+        boolean valide = false;
+
+        while( !valide ){
+            try {
+                System.out.println(question);
+                reponse = getJoueurReponse(question);
+                valide = true;
+            }
+            catch(WrongChoiceQuestion wcq){
+                wcq.printStackTrace();
+            }
+        }
+        // Le joueur a repondu juste
+        if (reponse.equals(question.getReponseValide())) {
+            joueur.ajouterVie(question.getNbPoints());
+            if (joueur.equals(joueur1)) {
+                joueur2.retirerVie(question.getNbPoints());
+            }
+            else {
+                joueur1.retirerVie(question.getNbPoints());
+            }
+            System.out.println("Réponse juste!");
+            System.out.println("Vous avez gagné " + question.getNbPoints() + " vies");
+        }
+
+        // Le joueur a repondu faux
+        else {
+            joueur.retirerVie(question.getNbPoints());
+            if (joueur.equals(joueur1)) {
+                joueur2.ajouterVie(question.getNbPoints());
+            }
+            else {
+                joueur1.ajouterVie(question.getNbPoints());
+            }
+            System.out.println("Réponse fausse!");
+            System.out.println("Vous avez perdu " + question.getNbPoints() + " vies");
+        }
+
+    }
+
+
+    // On utilisera des except a faire
     public String affichageReponseJuste() {
         return "La réponse est correct";
     }

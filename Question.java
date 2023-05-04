@@ -67,7 +67,7 @@ public class Question {
     }
 
     public String toString() {
-        return "Question : " + this.intitule + "Choix : " + this.choixQuestion + " Nb Point: " + this.nbPoints + " Reponse : " + this.reponseValide;
+        return this.intitule + " Choix : " + this.choixQuestion + " Nb Point: " + this.nbPoints;
     }
 
     public boolean equals(Question question) {

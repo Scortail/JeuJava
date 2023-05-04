@@ -8,12 +8,18 @@ public class Etudiant_test {
         Matiere physique = new Matiere("Physique");
         etudiant1.ajouterMatiere(maths);
         etudiant1.ajouterMatiere(physique);
+        etudiant2.ajouterMatiere(maths);
+        etudiant2.ajouterMatiere(physique);
         etudiant1.ajouterNote(maths, 15);
         etudiant2.ajouterNote(maths, 17);
         etudiant2.ajouterNote(physique, 12);
+        System.out.println(etudiant2.getNotes());
+
         System.out.println(etudiant1.getNotes());
         etudiant1.creerAvatar("Scortail");
         etudiant2.creerAvatar("Zedraal");
+        System.out.println(etudiant2.getAvatar().getLife());
+
         System.out.println(etudiant1.getAvatar().getLife());
         ArrayList<String> choix_reponse = new ArrayList<String>();
         choix_reponse.add("1939-1945");
@@ -37,6 +43,10 @@ public class Etudiant_test {
         etudiant1.getAvatar().creerDefi(etudiant2.getAvatar(), question4);
         Defi defi1 = etudiant2.getAvatar().getListeDefi().get(0);
         etudiant2.getAvatar().accepterDefi(defi1);
-        etudiant2.getAvatar().jouer(defi1, "Radiant", question2);
+        System.out.println(etudiant1.getAvatar().getLife());
+        System.out.println(etudiant2.getAvatar().getLife());
+        etudiant2.getAvatar().jouer(defi1);
+        System.out.println(etudiant1.getAvatar().getLife());
+        System.out.println(etudiant2.getAvatar().getLife());
     }
 }

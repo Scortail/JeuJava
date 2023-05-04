@@ -58,16 +58,18 @@ public class Avatar {
     }
 
 
-    public Defi creerDefi(Avatar joueurDefier, Question question) {
+    public Defi creerDefi(Avatar joueurDefier, Question ... questions) {
         Defi defi = new Defi(this, joueurDefier);
         this.listeDefi.add(defi);
         joueurDefier.listeDefi.add(defi);
-        defi.ajouterQuestion(question);
+        for (Question question : questions) {
+            defi.ajouterQuestionJoueur1(question);
+        }
         return defi;
     }
 
 
-    public void accepterDefi(Defi defi) {
+    public void accepterDefi(Defi defi, Question ... questions) {
         if (this == defi.getJoueur2()) {
             defi.setEtat(1);
             System.out.println("Le défi a été accepté par " + pseudo);
@@ -88,35 +90,27 @@ public class Avatar {
     }
     
     // Joueur joue, repond a une question puis choisi de sarreter la en den envoyer une
-    public void jouer(Defi defi, String reponse, Question newQuestion) {
-        int nQuestion = defi.getListeQuestions().size();
-        Question question = defi.getListeQuestions().get(nQuestion-1);
-        if (nQuestion % 2 == 0 && this.equals(defi.getJoueur1())) {
-            defi.ajouterQuestion(newQuestion);
-            if (question.verifReponse(reponse)) {
-                System.out.println(defi.affichageReponseJuste());
+    public void jouer(Defi defi) {
+        ArrayList<Question> listeQuestions;
+        if (listeDefi.contains(defi)) {
+            if (this.equals(defi.getJoueur1())) {
+                listeQuestions = defi.getListeQuestionsJoueur2();
             }
+    
             else {
-                System.out.println(defi.affichageReponseFausse());
+                listeQuestions = defi.getListeQuestionsJoueur1();
+            }
+            int i = 1;
+            for (Question question : listeQuestions) {
+                System.out.println("Question " + i + " : ");
+                defi.repondreQuestion(question, this);
             }
         }
-
-        if (nQuestion % 2 == 1 && this.equals(defi.getJoueur2())) {
-            defi.ajouterQuestion(newQuestion);
-            if (question.verifReponse(reponse)) {
-                System.out.println(defi.affichageReponseJuste());
-            }
-            else {
-                System.out.println(defi.affichageReponseFausse());
-            }
-        }
-
-        else {
-            System.out.println(defi.affichageWrongPlayer());
-        }
-    }
         
 
-
+        else {
+            System.out.println("Vous n'etes pas concerné par ce defi!");
+        }
+    }
 }
 
