@@ -1,8 +1,12 @@
-import java.util.HashMap;
-import java.util.Map;
-import java.util.ArrayList;;
+import java.util.*;
+import java.io.Serializable;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
+import java.io.EOFException;
 
-public class Etudiant {
+public class Etudiant implements Serializable{
     private String nom;
     private String prenom;
     private Map<Matiere, ArrayList<Note>> Notes = new HashMap<Matiere, ArrayList<Note>>();
@@ -72,6 +76,14 @@ public class Etudiant {
         ajouterNote(matiere, note, 1);
     }
 
+    // A ameliorer
+    public void afficherBulletin() {
+        for (Map.Entry<Matiere, ArrayList<Note>> entry : Notes.entrySet()) {
+            ArrayList<Note> notes = entry.getValue();
+            System.out.println("" + entry.getKey() + notes);
+        }
+    }
+
     // Création d'avatar
     public void creerAvatar(String pseudo) {
         if (this.avatar == null) {
@@ -92,6 +104,20 @@ public class Etudiant {
 
     public String toString() {
         return "Nom : " + this.nom + " Prenom : " + this.prenom + " Notes : " + this.Notes;
+    }
+
+
+    public void verifierEcritureAvatar() {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("avatars.ser"))) {
+            while (true) {
+                Avatar avatar = (Avatar) ois.readObject();
+                System.out.println(avatar);
+            }
+        } catch (EOFException e) {
+            // La fin du fichier a été atteinte, on sort de la boucle
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
 

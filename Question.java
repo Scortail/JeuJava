@@ -1,34 +1,27 @@
-// chaque joeur vont pouvoir avoir des questions de base peut etre il faut quil y reponde dabord mais en cas de bonne reponse a une question elle sajoute a sa liste des questions.
 import java.util.ArrayList;
-// import java.util.Scanner;
+import java.io.Serializable;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
+import java.io.EOFException;
 
-public class Question {
+public class Question implements Serializable{
     private String intitule;
     private ArrayList<String> choixQuestion;
-    private int nbPoints;
+    private int difficulte; // 1 = 5 points, 2 = 10 points, 3 = 20 points
     private String reponseValide;
 
-    public Question(String intitule, ArrayList<String> choixQuestion, int nbPoints, String reponseValide) {
+
+    // Quand on cree une question verifier la difficulte
+    public Question(String intitule, ArrayList<String> choixQuestion, int difficulte, String reponseValide) {
         this.intitule = intitule;
         this.choixQuestion = choixQuestion;
-        this.nbPoints = nbPoints;
+        this.difficulte = difficulte;
         this.reponseValide = reponseValide;
-
-
-        // boolean choixReponses = true;
-        // while (choixReponses) {
-
-        //     Scanner choixReponse = new Scanner(System.in);  // Create a Scanner object
-        //     System.out.println("Entrez un mot pour ajouter une reponse a la question puis taper entrez ou entrez ok apres avoir mis a moins 2 reponses différentes! ");
-
-        //     String reponse = choixReponse.nextLine();  // Read user input
-        //     if (reponse == "ok" && choixQuestion.size() > 1) {
-
-        //     }
-
-        //     System.out.println("Username is: " + userName);  // Output user input
-        // }
-
+        ArrayList<Question> questions = chargerQuestions(); // charger les questions existantes
+        questions.add(this); // ajouter la nouvelle question à la liste
+        sauvegarderQuestions(questions); // sauvegarder la liste complète dans le fichier
     }
 
     public String getIntitule() {
@@ -39,20 +32,35 @@ public class Question {
         return choixQuestion;
     }
 
-    public int getNbPoints() {
-        return nbPoints;
+    public int getDifficulte() {
+        return difficulte;
     }
 
     public String getReponseValide() {
         return reponseValide;
     }
 
+    public int getNbPoints() {
+        switch (difficulte) {
+        case 1:
+            return 5;
+            
+        case 2 :
+            return 10;
+        case 3:
+            return 20;  
+
+        default:
+            return 0;        
+        }
+    }
+
     public void setIntitule(String intitule) {
         this.intitule = intitule;
     }
 
-    public void setNbPoints(int nbPoints) {
-        this.nbPoints = nbPoints;
+    public void setNbPoints(int difficulte) {
+        this.difficulte = difficulte;
     }
 
     public void setReponseValide(String reponseValide) {
@@ -67,13 +75,44 @@ public class Question {
     }
 
     public String toString() {
-        return this.intitule + " Choix : " + this.choixQuestion + " Nb Point: " + this.nbPoints;
+        return this.intitule + " Choix : " + this.choixQuestion + " Difficulte : " + this.difficulte;
     }
 
     public boolean equals(Question question) {
-        if (this.intitule == question.intitule && this.choixQuestion == question.choixQuestion && this.nbPoints == question.nbPoints && this.reponseValide == question.reponseValide) {
+        if (this.intitule == question.intitule && this.choixQuestion == question.choixQuestion && this.difficulte == question.difficulte && this.reponseValide == question.reponseValide) {
             return true;
         }
         return false;
     }
+
+        // Écrit toutes les questions dans un nouveau fichier
+        public void sauvegarderQuestions(ArrayList<Question> questions) {
+            try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("questions.ser"))) {
+                for (Question question : questions) {
+                    oos.writeObject(question);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        
+        // Charge tous les questions depuis le fichier
+        public ArrayList<Question> chargerQuestions() {
+            ArrayList<Question> questions = new ArrayList<>();
+            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("questions.ser"))) {
+                while (true) {
+                    try {
+                        Object obj = ois.readObject();
+                        if (obj instanceof Question) {
+                            questions.add((Question) obj);
+                        }
+                    } catch (EOFException e) {
+                        break;
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return questions;
+        }
 }

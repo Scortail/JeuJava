@@ -1,8 +1,13 @@
 import java.util.ArrayList;
+import java.io.Serializable;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
+import java.io.EOFException;
 
 
-
-public class Avatar {
+public class Avatar implements Serializable{
     private String pseudo;
     private double life;
     private ArrayList<Defi> listeDefi = new ArrayList<Defi>();
@@ -12,6 +17,9 @@ public class Avatar {
     public Avatar(String pseudo, double life) {
         this.pseudo = pseudo;
         this.life = life;
+        ArrayList<Avatar> avatars = chargerAvatars(); // charger les avatars existants
+        avatars.add(this); // ajouter le nouvel avatar à la liste
+        sauvegarderAvatars(avatars); // sauvegarder la liste complète dans le fichier
     }
 
 
@@ -43,9 +51,15 @@ public class Avatar {
     public void setLife(float life) {
         this.life = life;
     }
+
+    public void setListeDefi(ArrayList<Defi> listeDefi) {
+        this.listeDefi = listeDefi;
+    }
+
+    public void setListeQuestion(ArrayList<Question> listeQuestion) {
+        this.listeQuestion = listeQuestion;
+    }
     
-
-
     // On peut ajouter de la vie à notre avatar
     public void ajouterVie(double life) {
         this.life += life;
@@ -57,7 +71,12 @@ public class Avatar {
         this.life -= life;
     }
 
+    // Ajoute des questions à l'avatar
+    public void ajouterQuestion(Question question) {
+        listeQuestion.add(question);
+    }
 
+    // Permet de defier un joueur
     public Defi creerDefi(Avatar joueurDefier, Question ... questions) {
         Defi defi = new Defi(this, joueurDefier);
         this.listeDefi.add(defi);
@@ -89,7 +108,7 @@ public class Avatar {
         }
     }
     
-    // Joueur joue, repond a une question puis choisi de sarreter la en den envoyer une
+    // 2 jours pour accepter puis 20 minutes pour jouer
     public void jouer(Defi defi) {
         ArrayList<Question> listeQuestions;
         if (listeDefi.contains(defi)) {
@@ -109,8 +128,43 @@ public class Avatar {
         
 
         else {
-            System.out.println("Vous n'etes pas concerné par ce defi!");
+            System.out.println("Vous n'etes pas concerné par ce defi !");
         }
+    }
+
+    // Écrit tous les avatars dans un nouveau fichier
+    public void sauvegarderAvatars(ArrayList<Avatar> avatars) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("avatars.ser"))) {
+            for (Avatar avatar : avatars) {
+                oos.writeObject(avatar);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    // Charge tous les avatars depuis le fichier
+    public ArrayList<Avatar> chargerAvatars() {
+        ArrayList<Avatar> avatars = new ArrayList<>();
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("avatars.ser"))) {
+            while (true) {
+                try {
+                    Object obj = ois.readObject();
+                    if (obj instanceof Avatar) {
+                        avatars.add((Avatar) obj);
+                    }
+                } catch (EOFException e) {
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return avatars;
+    }
+
+    public String toString() {
+        return "Pseudo : " + pseudo + " Nb vie : " + life;
     }
 }
 

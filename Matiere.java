@@ -9,6 +9,7 @@ public class Matiere {
         return nomMatiere;
     }
 
+
     public void setNomMatiere(String nomMatiere) {
         this.nomMatiere = nomMatiere;
     }

@@ -1,6 +1,4 @@
 import java.util.*;
-// Lors dun defi les joueur senvoi des question 
-// a tour de role on pose une question, on a loption arreter defi regle a definir exemple: meme nb de question chacun ? des quun arrete, tout sarrete ou il faut le meme nb de question repondu
 
 public class Defi {
     private Avatar joueur1;
@@ -8,8 +6,6 @@ public class Defi {
     private int etat; // -1 : refusé, 0 : en attente, 1 : accepté
     private ArrayList<Question> listeQuestionsJoueur1;
     private ArrayList<Question> listeQuestionsJoueur2;
-
-
 
     public Defi(Avatar joueur1, Avatar joueur2) {
         this.joueur1 = joueur1;
@@ -58,7 +54,6 @@ public class Defi {
         }
     }
     
-
     public String getJoueurReponse(Question question) throws WrongChoiceQuestion{
         Scanner sc = new Scanner(System.in) ;
 
@@ -70,7 +65,6 @@ public class Defi {
             throw new WrongChoiceQuestion();
         return reponse;
     }
-
 
     public void ajouterQuestionJoueur1(Question question) {
         this.listeQuestionsJoueur1.add(question);
@@ -85,7 +79,7 @@ public class Defi {
 
         boolean valide = false;
 
-        while( !valide ){
+        while( !valide ) {
             try {
                 System.out.println(question);
                 reponse = getJoueurReponse(question);
@@ -122,23 +116,4 @@ public class Defi {
         }
 
     }
-
-
-    // On utilisera des except a faire
-    public String affichageReponseJuste() {
-        return "La réponse est correct";
-    }
-
-    public String affichageReponseFausse() {
-        return "La réponse est Fausse";
-    }
-
-    public String affichageWrongPlayer() {
-        return "Désoler ce n'est pas ton tour";
-    }
-
-    public String affichageAToiDeJouer() {
-        return "C'est ton tour mon reuf";
-    }
-
 }
