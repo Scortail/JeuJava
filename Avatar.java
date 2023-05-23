@@ -54,7 +54,7 @@ public class Avatar implements Serializable{
         this.pseudo = pseudo;
     }
 
-    public void setLife(float life) {
+    public void setLife(double life) {
         this.life = life;
     }
 
@@ -69,7 +69,6 @@ public class Avatar implements Serializable{
     // On peut ajouter de la vie à notre avatar
     public void ajouterVie(double life) {
         this.life += life;
-        sauvegarderAvatar();
     }
     
     // On peut retirer de la vie à notre avatar
@@ -77,9 +76,8 @@ public class Avatar implements Serializable{
         this.life -= life;
         if(this.life < 0) {
             this.life = 0;
-            System.out.println("Vous n'avez plus de vies.");
+            System.out.println(pseudo + " n'a plus de vies.");
         }
-        sauvegarderAvatar();
     }
 
     // Ajoute des questions à l'avatar
@@ -90,13 +88,15 @@ public class Avatar implements Serializable{
 
     // Permet de defier un joueur
     public void creerDefi(Avatar joueurDefier, Question ... questions) {
+        if (life == 0) {
+            System.out.println("Vous n'avez plus de vie, vous ne pouvez donc pas creer de défi.\nEssayez de participez a des tests ou attendez vos prochaine note pour défier vos camarades");
+        }
         Defi defi = new Defi(this, joueurDefier);
         this.listeDefi.add(defi);
         joueurDefier.listeDefi.add(defi);
         for (Question question : questions) {
             defi.ajouterQuestionJoueur1(question);
         }
-        sauvegarderAvatar();
     }
 
     public String afficherQuestionsDispo() {
@@ -104,7 +104,7 @@ public class Avatar implements Serializable{
         int numero = 0;
         for (Question question : listeQuestion) {
             numero += 1;
-            questions += numero + " : " + question;
+            questions += numero + " : " + question + "\n";
         }
         return questions;
     }
@@ -138,11 +138,13 @@ public class Avatar implements Serializable{
     public void accepterDefi(Defi defi, Question ... questions) {
         if (this == defi.getJoueur2()) {
             defi.setEtat(1);
+            for ( Question question : questions) {
+                defi.ajouterQuestionJoueur2(question);
+            }
             System.out.println("Le défi a été accepté par " + pseudo);
         } else {
             System.out.println("Vous ne pouvez pas accepter ce défi car vous n'êtes pas le joueur défié.");
         }
-        sauvegarderAvatar();
     }
 
 
@@ -154,7 +156,6 @@ public class Avatar implements Serializable{
         else {
             System.out.println("Vous ne pouvez pas accepter ce défi car vous n'êtes pas le joueur défié.");
         }
-        sauvegarderAvatar();
     }
     
     // 2 jours pour accepter puis 20 minutes pour jouer
@@ -169,10 +170,11 @@ public class Avatar implements Serializable{
                 listeQuestions = defi.getListeQuestionsJoueur1();
             }
             int i = 1;
+            System.out.println(listeQuestions);
             for (Question question : listeQuestions) {
                 System.out.println("Question " + i + " : ");
+                System.out.println(this.life);
                 defi.repondreQuestion(question, this);
-                sauvegarderAvatar();
             }
         }
         else {

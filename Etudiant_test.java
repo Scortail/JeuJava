@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 
 public class Etudiant_test {
     public static void main(String[] args) {

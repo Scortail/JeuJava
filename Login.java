@@ -63,10 +63,10 @@ public class Login implements Serializable {
     // Retourne l'etudiant connecter
     public Etudiant trouveEtudiantConnecter() {
         ArrayList<Etudiant> listeEtudiant = Etudiant.chargerEtudiant();
-        for (Etudiant etudiant : listeEtudiant) {
-            Avatar avatar = etudiant.getAvatar();
-            if (avatar.getPseudo().equals(login)) {
-                return etudiant;
+        for (Etudiant eleve : listeEtudiant) {
+            Avatar avatar = eleve.getAvatar();
+            if (avatar != null && avatar.getPseudo().equals(login)) {
+                return eleve;
             }
         }
         return null;
@@ -107,6 +107,7 @@ public class Login implements Serializable {
         password = sc.nextLine();
 
         Map<String, String> logins = chargerLogins();
+        System.out.println(logins);
 
         if (login.length() > 10 || password.length() > 10)
             throw new WrongInputLengthException();
@@ -190,42 +191,40 @@ public class Login implements Serializable {
                 System.exit(0); //pb inconnu; on sort de la méthode pour limiter les risques
             }
         }
-        Map<String, String> logins = chargerLogins();
-        logins.put(login, password);
-        sauvegarderLogins(logins);
     }
 
     public void inscription() {
-        Boolean insciption = false;
-        while (!insciption) {
+        Boolean inscription = false;
+        while (!inscription) {
             try {
                 etudiant = getUserInfo();
                 System.out.println("Bienvenue");
                 creerCompte();
-                String pseudo = getLogin();
-                etudiant.creerAvatar(pseudo);
-                insciption = true;
-            }
-            catch(WrongInfoException wie){
+                etudiant.creerAvatar(login);
+                Map<String, String> logins = chargerLogins();  // Charger les logins existants
+                logins.put(login, password);  // Ajouter le nouveau login et mot de passe
+                sauvegarderLogins(logins);  // Sauvegarder les logins mis à jour
+                inscription = true;
+            } catch (WrongInfoException wie) {
                 wie.printStackTrace();
-            }
-
-            catch(AvatarExistantException aee){
+            } catch (AvatarExistantException aee) {
                 aee.printStackTrace();
                 break;
             }
         }
     }
+    
 
     // Écrit tous les etudiants dans un nouveau fichier
     protected static void sauvegarderLogins(Map<String, String> logins) {
-        List<Map.Entry<String, String>> entries = new ArrayList<>(logins.entrySet());
+        Map<String, String> serializableMap = new HashMap<>(logins);
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("Login.ser"))) {
-            oos.writeObject(entries);
+            oos.writeObject(serializableMap);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+    
     
     
     // Charge tous les logins depuis le fichier
@@ -235,11 +234,8 @@ public class Login implements Serializable {
         if (file.exists()) {
             try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
                 Object obj = ois.readObject();
-                if (obj instanceof List<?>) {
-                    List<Map.Entry<String, String>> entries = (List<Map.Entry<String, String>>) obj;
-                    for (Map.Entry<String, String> entry : entries) {
-                        map.put(entry.getKey(), entry.getValue());
-                    }
+                if (obj instanceof Map<?, ?>) {  // Utilisez Map au lieu de List dans la vérification
+                    map = (Map<String, String>) obj;  // Cast directement en Map<String, String>
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -247,6 +243,5 @@ public class Login implements Serializable {
         }
         return map;
     }
-    
 
 }

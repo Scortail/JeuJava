@@ -76,26 +76,110 @@ public class seriousGame {
                 System.out.println("Erreur : le numéro de question \"" + numQuestion + "\" n'est pas un chiffre valide.");
             }
         }
-        if (questionsChoisies.size() == 0) {
+        if (questionsChoisies.isEmpty()) {
             throw new NoValidQuestionException();
         }
         return questionsChoisies;
     }
 
-
+    private void afficherDefisEnCours(Avatar avatar) {
+    System.out.println("Liste des défis en cours :");
+    ArrayList<Defi> defis = avatar.getListeDefi();
+    Defi defiChoisi = null;
+    Scanner sc = new Scanner(System.in);
     
+    // Affichage des défis en cours
+    for (int i = 0; i < defis.size(); i++) {
+        Defi defi = defis.get(i);
+        System.out.println("Défi " + (i + 1));
+        if (avatar.equals(defi.getJoueur1())) {
+            System.out.println("Joueur adversaire : " + defi.getJoueur2().getPseudo());
+        }
+        else {
+            System.out.println("Joueur adversaire : " + defi.getJoueur1().getPseudo());
+        }
+        System.out.println("État du défi : " + defi.getEtat());
+        System.out.println();
+    }
+    
+    boolean choisirDefi = true;
+    while (choisirDefi) {
+        System.out.println("Taper le numéro du défi auquel vous souhaitez participer (ou Q pour quitter) : ");
+        String choixDefi = sc.nextLine();
+        
+        if (choixDefi.equalsIgnoreCase("Q")) {
+            choisirDefi = false;
+        } else {
+            try {
+                int numeroDefi = Integer.parseInt(choixDefi) - 1;
+                if (numeroDefi >= 0 && numeroDefi < defis.size()) {
+                    defiChoisi = defis.get(numeroDefi);
+                    // Si on a créé le defi mais qu'il nest pas encore accepter
+                    if (defiChoisi.getEtat() == 0 && defiChoisi.getJoueur1().equals(avatar)) {
+                        System.out.println("En attente d'une réponse de l'adversaire");
+                    }
+                    // Si on est defier
+                    else if (defiChoisi.getEtat() == 0) { // Défi en attente d'acceptation
+                        System.out.println("Voulez-vous accepter ou refuser le défi ? (A pour accepter, R pour refuser) : ");
+                        String choixAccepter = sc.nextLine();
+                        
+                        if (choixAccepter.equalsIgnoreCase("A")) { // Accepter le défi
+                            Boolean valide = false;
+                            ArrayList<Question> listeQuestions = null;
+                            while (!valide) {
+                                try {
+                                    listeQuestions = getChoixQuestions(avatar);
+                                    valide = true;
+                                } catch (NoValidQuestionException nvqe) {
+                                    nvqe.printStackTrace();
+                                }
+                            }
+                            System.out.println(listeQuestions);
+                            avatar.accepterDefi(defiChoisi, listeQuestions.toArray(new Question[listeQuestions.size()]));
+                            choisirDefi = false;
+                        } else if (choixAccepter.equalsIgnoreCase("R")) { // Refuser le défi
+                            avatar.refuserDefi(defiChoisi);
+                            System.out.println("Vous avez refusé le défi.");
+                            choisirDefi = false;
+                        } else {
+                            System.out.println("Choix invalide. Veuillez réessayer.");
+                        }
+
+                    } else if (defiChoisi.getEtat() == 1) { // Défi accepté
+                        System.out.println("Voulez-vous participer à ce défi ? (O/N) : ");
+                        String choixParticiper = sc.nextLine();
+                        
+                        if (choixParticiper.equalsIgnoreCase("O")) { // Participer au défi
+                            avatar.jouer(defiChoisi);
+                            choisirDefi = false;
+                        } else if (choixParticiper.equalsIgnoreCase("N")) { // Ne pas participer au défi
+                            choisirDefi = false;
+                        } else {
+                            System.out.println("Choix invalide. Veuillez réessayer.");
+                        }
+                    }
+                } else {
+                    System.out.println("Numéro de défi invalide. Veuillez réessayer.");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Numéro de défi invalide. Veuillez réessayer.");
+            }
+        }
+    }
+}
+
 
     public void play(Login login) {
         Avatar avatar = login.getEtudiant().getAvatar();
+        System.out.println("Bonjour " + avatar.getPseudo());
         boolean play = true;
         while (play) {
             Boolean valide = false;
             String choix = null;
             while (!valide) {
                 try {
-                    System.out.println("Bonjour " + avatar.getPseudo());
                     System.out.println("Taper 1 pour voir les défis en cours");
-                    System.out.println("Taper 2 pour defier un avatar");
+                    System.out.println("Taper 2 pour défier un avatar");
                     System.out.println("Taper Q pour quitter");
                     choix = userChoice();
                     valide = true;
@@ -105,8 +189,11 @@ public class seriousGame {
             }
             if (choix.equals("Q") || choix.equals("q")) {
                 play = false;
-            }
-            else if(choix.equals("2")) {
+
+            } else if (choix.equals("1")) { // Ajout de la condition pour afficher les défis en cours
+                afficherDefisEnCours(avatar);
+
+            } else if (choix.equals("2")) {
                 valide = false;
                 Avatar avatar_defier = null;
                 ArrayList<Question> listeQuestions = null;
@@ -125,40 +212,46 @@ public class seriousGame {
             }
         }
     }
-
     
-    public Login menu_principal() {
+    public void menu_principal() {
         Login login = null;
-        boolean menu = true;
-        while (menu) {
-            boolean valide = false;
-            String choix = null;
-            while (!valide) {
-                try {
-                    System.out.println("Bienvenue dans le serious game");
-                    System.out.println("Taper 1 pour vous identifier");
-                    System.out.println("Taper 2 pour vous inscrire");
-                    System.out.println("Taper Q pour quitter");
-                    choix = userChoice();
-                    valide = true;
-                } catch (WrongOptionChoice woc) {
-                    woc.printStackTrace();
+        boolean start = true;
+        while (start) {
+            boolean menu = true;
+            while (menu) {
+                boolean valide = false;
+                String choix = null;
+                while (!valide) {
+                    try {
+                        System.out.println("Bienvenue dans le serious game");
+                        System.out.println("Taper 1 pour vous identifier");
+                        System.out.println("Taper 2 pour vous inscrire");
+                        System.out.println("Taper Q pour quitter");
+                        choix = userChoice();
+                        valide = true;
+                    } catch (WrongOptionChoice woc) {
+                        woc.printStackTrace();
+                    }
                 }
-            }
-            if (choix.equals("Q") || choix.equals("q")) {
-                menu = false;
-            }
+                if (choix.equals("Q") || choix.equals("q")) {
+                    menu = false;
+                    start = false;
+                }
 
-            else if(choix.equals("2")) {
-                login = new Login();
-                login.inscription();  
-            }
+                else if(choix.equals("2")) {
+                    login = new Login();
+                    login.inscription();
+                    menu = false;
+                }
 
-            else if(choix.equals("1")) {
-                login = new Login();
-                login.connexion();
-            } 
+                else if(choix.equals("1")) {
+                    login = new Login();
+                    login.connexion();
+                    menu = false;
+                } 
+            }
+            play(login);
+            menu = true;
         }
-        return login;
     }
 }
