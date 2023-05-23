@@ -1,4 +1,6 @@
-public class Matiere {
+import java.io.*;
+
+public class Matiere implements Serializable{
     private String nomMatiere;
 
     public Matiere(String nomMatiere) {

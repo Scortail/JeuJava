@@ -1,10 +1,5 @@
-import java.util.ArrayList;
-import java.io.Serializable;
-import java.io.FileOutputStream;
-import java.io.ObjectOutputStream;
-import java.io.FileInputStream;
-import java.io.ObjectInputStream;
-import java.io.EOFException;
+import java.util.*;
+import java.io.*;
 
 
 public class Avatar implements Serializable{
@@ -17,11 +12,19 @@ public class Avatar implements Serializable{
     public Avatar(String pseudo, double life) {
         this.pseudo = pseudo;
         this.life = life;
-        ArrayList<Avatar> avatars = chargerAvatars(); // charger les avatars existants
-        avatars.add(this); // ajouter le nouvel avatar à la liste
-        sauvegarderAvatars(avatars); // sauvegarder la liste complète dans le fichier
-    }
 
+        // On ajoute des questions aléatoire lors de sa création
+        ArrayList<Question> questionsDispo = Question.chargerQuestions();
+        Random random = new Random();
+        int totalQuestions = questionsDispo.size();
+        for (int i = 0; i < 3; i++) {
+            int randomIndex = random.nextInt(totalQuestions);
+            Question question = questionsDispo.get(randomIndex);
+            listeQuestion.add(question);
+            questionsDispo.remove(randomIndex);
+            totalQuestions--;
+        }
+    }
 
     public String getPseudo() {
         return this.pseudo;
@@ -32,21 +35,24 @@ public class Avatar implements Serializable{
         return this.life;
     }
 
-
     public ArrayList<Defi> getListeDefi() {
         return this.listeDefi;
     }
-
 
     public ArrayList<Question> getListeQuestion() {
         return this.listeQuestion;
     }
 
+    public Question getQuestion(int numero) {
+        if (numero <= listeQuestion.size() && numero > 0){
+            return listeQuestion.get(numero-1);
+        }
+        return null;
+    }
 
     public void setPseudo(String pseudo) {
         this.pseudo = pseudo;
     }
-
 
     public void setLife(float life) {
         this.life = life;
@@ -63,30 +69,71 @@ public class Avatar implements Serializable{
     // On peut ajouter de la vie à notre avatar
     public void ajouterVie(double life) {
         this.life += life;
+        sauvegarderAvatar();
     }
-
-
+    
     // On peut retirer de la vie à notre avatar
     public void retirerVie(double life) {
         this.life -= life;
+        if(this.life < 0) {
+            this.life = 0;
+            System.out.println("Vous n'avez plus de vies.");
+        }
+        sauvegarderAvatar();
     }
 
     // Ajoute des questions à l'avatar
     public void ajouterQuestion(Question question) {
         listeQuestion.add(question);
+        sauvegarderAvatar();
     }
 
     // Permet de defier un joueur
-    public Defi creerDefi(Avatar joueurDefier, Question ... questions) {
+    public void creerDefi(Avatar joueurDefier, Question ... questions) {
         Defi defi = new Defi(this, joueurDefier);
         this.listeDefi.add(defi);
         joueurDefier.listeDefi.add(defi);
         for (Question question : questions) {
             defi.ajouterQuestionJoueur1(question);
         }
-        return defi;
+        sauvegarderAvatar();
     }
 
+    public String afficherQuestionsDispo() {
+        String questions = "";
+        int numero = 0;
+        for (Question question : listeQuestion) {
+            numero += 1;
+            questions += numero + " : " + question;
+        }
+        return questions;
+    }
+
+    // Retourne l'avatar possédant le pseudo rechercher
+    public Avatar chercherAvatar(String pseudo) {
+        ArrayList<Etudiant> etudiants = Etudiant.chargerEtudiant();
+        for (Etudiant etudiant : etudiants) {
+            Avatar avatar = etudiant.getAvatar();
+            if (!(avatar == null)) {
+                if (avatar.getPseudo().equals(pseudo)) {
+                    return avatar;
+                }
+            }
+        }
+        return null;
+    }
+
+    public static String afficherAvatars() {
+        String affichage = "";
+        ArrayList<Etudiant> listeEtudiant = Etudiant.chargerEtudiant();
+        for (Etudiant etudiant : listeEtudiant) {
+            Avatar avatar = etudiant.getAvatar();
+            if (!(avatar == null)) {
+                affichage += avatar.getPseudo();
+            }
+        }
+        return affichage;
+    }
 
     public void accepterDefi(Defi defi, Question ... questions) {
         if (this == defi.getJoueur2()) {
@@ -95,6 +142,7 @@ public class Avatar implements Serializable{
         } else {
             System.out.println("Vous ne pouvez pas accepter ce défi car vous n'êtes pas le joueur défié.");
         }
+        sauvegarderAvatar();
     }
 
 
@@ -106,6 +154,7 @@ public class Avatar implements Serializable{
         else {
             System.out.println("Vous ne pouvez pas accepter ce défi car vous n'êtes pas le joueur défié.");
         }
+        sauvegarderAvatar();
     }
     
     // 2 jours pour accepter puis 20 minutes pour jouer
@@ -123,44 +172,35 @@ public class Avatar implements Serializable{
             for (Question question : listeQuestions) {
                 System.out.println("Question " + i + " : ");
                 defi.repondreQuestion(question, this);
+                sauvegarderAvatar();
             }
         }
-        
-
         else {
             System.out.println("Vous n'etes pas concerné par ce defi !");
         }
     }
 
-    // Écrit tous les avatars dans un nouveau fichier
-    public void sauvegarderAvatars(ArrayList<Avatar> avatars) {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("avatars.ser"))) {
-            for (Avatar avatar : avatars) {
-                oos.writeObject(avatar);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-    
-    // Charge tous les avatars depuis le fichier
-    public ArrayList<Avatar> chargerAvatars() {
-        ArrayList<Avatar> avatars = new ArrayList<>();
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("avatars.ser"))) {
-            while (true) {
-                try {
-                    Object obj = ois.readObject();
-                    if (obj instanceof Avatar) {
-                        avatars.add((Avatar) obj);
-                    }
-                } catch (EOFException e) {
-                    break;
+    // Nous permet de sauvegarder un avatar
+    public void sauvegarderAvatar() {
+        ArrayList<Etudiant> listeEtudiant = Etudiant.chargerEtudiant();
+        for (Etudiant etudiant : listeEtudiant) {
+            Avatar avatar = etudiant.getAvatar();
+            if (!(avatar == null)) {
+                if (avatar.getPseudo().equals(pseudo)) {
+                    listeEtudiant.remove(etudiant);
+                    etudiant.setAvatar(this);
+                    listeEtudiant.add(etudiant);
+                    Etudiant.sauvegarderEtudiants(listeEtudiant);
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
-        return avatars;
+    }
+
+    public boolean equals(Avatar avatar) {
+        if (this.pseudo.equals(avatar.getPseudo())) {
+            return true;
+        }
+        return false;
     }
 
     public String toString() {

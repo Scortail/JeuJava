@@ -1,8 +1,11 @@
-public class Note {
+import java.io.*;
+
+
+public class Note implements Serializable{
     private double note;
     private double coefficient;
 
-    class WrongNoteException extends Exception{
+    class WrongNoteException extends Exception {
 
         public String toString(){
             return "Erreur: La note n'est pas compris entre 0 et 20.";

@@ -17,6 +17,11 @@ public class Etudiant_test {
 
         // System.out.println(etudiant1.getNotes());
         // etudiant1.creerAvatar("Scortail");
+        // Etudiant.verifierEcritureEtudiant();
+        // System.out.println("TEST");
+        // etudiant1.getAvatar().retirerVie(10);
+        // Etudiant.verifierEcritureEtudiant();
+        // System.out.println(etudiant1.getAvatar());
         // etudiant2.creerAvatar("Zedraal");
         // System.out.println(etudiant2.getAvatar().getLife());
 
@@ -46,9 +51,9 @@ public class Etudiant_test {
         // System.out.println(etudiant1.getAvatar().getLife());
         // System.out.println(etudiant2.getAvatar().getLife());
         // etudiant2.getAvatar().jouer(defi1);
-        // System.out.println(etudiant1.getAvatar().getLife());
-        // System.out.println(etudiant2.getAvatar().getLife());
-        etudiant1.verifierEcritureAvatar();
-        etudiant1.afficherBulletin();
+        // // System.out.println(etudiant1.getAvatar().getLife());
+        // // System.out.println(etudiant2.getAvatar().getLife());
+        // etudiant1.verifierEcritureAvatar();
+        // etudiant1.afficherBulletin();
     }
 }
