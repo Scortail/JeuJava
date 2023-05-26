@@ -47,7 +47,7 @@ public class Defi implements Serializable{
             case 0:
                 return "En attente";
             case 1:
-                switch (etatjeu) {
+                switch (etatJeu) {
                     case -1:
                         return "Accepté";
                     case 0:
@@ -102,8 +102,8 @@ public class Defi implements Serializable{
         sauvegarderDefi();
     }
 
-    public void setEtat_jeu(int newEtat) {
-        this.etat_jeu = newEtat;
+    public void setEtatJeu(int newEtat) {
+        this.etatJeu = newEtat;
         sauvegarderDefi();
     }
     
@@ -115,7 +115,6 @@ public class Defi implements Serializable{
     }
     
     public String getJoueurReponse(Question question, Scanner sc) throws WrongChoiceQuestion{
-
         System.out.println("Votre réponse : ");
         String reponse = sc.nextLine();
         for (int i=1; i<=question.getChoixReponse().size(); i++)
@@ -212,7 +211,7 @@ public class Defi implements Serializable{
                 joueur2.refuserDefi(this);
             }
             // J2 n'a pas joué
-            else if (etat_jeu == 0) {
+            else if (etatJeu == 0) {
                 System.out.println(joueur2.getPseudo() + " n'a pas joué dans les temps.");
                 double malus = 0;
                 for (Question question : listeQuestionsJoueur1) {
@@ -221,7 +220,7 @@ public class Defi implements Serializable{
                 joueur2.retirerVie(malus*0.2);
             }
             // J1 n'a pas joué
-            else if (etat_jeu == 1) {
+            else if (etatJeu == 1) {
                 System.out.println(joueur1.getPseudo() + " n'a pas joué dans les temps.");
                 double malus = 0;
                 for (Question question : listeQuestionsJoueur2) {

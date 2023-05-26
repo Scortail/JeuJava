@@ -138,7 +138,7 @@ public class Avatar implements Serializable{
     public void accepterDefi(Defi defi, Question ... questions) {
         if (this == defi.getJoueur2()) {
             defi.setEtat(1);
-            defi.setEtat_jeu(0);
+            defi.setEtatJeu(0);
             for ( Question question : questions) {
                 defi.ajouterQuestionJoueur2(question);
             }
@@ -170,25 +170,25 @@ public class Avatar implements Serializable{
     public void jouer(Defi defi, Scanner sc) {
         ArrayList<Question> listeQuestions;
         if (listeDefi.contains(defi)) {
-            if (defi.getEtat_jeu() == 2) {
+            if (defi.getEtatJeu() == 2) {
                 System.out.println("Ce defi est terminé");
             }
             else {
                 if (this.equals(defi.getJoueur1())) {
-                    if (defi.getEtat_jeu() == 0) {
+                    if (defi.getEtatJeu() == 0) {
                         System.out.println("Vous avez déjà jouer");
                         return;
                     }
                     listeQuestions = defi.getListeQuestionsJoueur2();
-                    defi.setEtat_jeu(0);                
+                    defi.setEtatJeu(0);                
                 }
                 else {
-                    if (defi.getEtat_jeu() == 1) {
+                    if (defi.getEtatJeu() == 1) {
                         System.out.println("Vous avez déjà jouer");
                         return;
                     }
                     listeQuestions = defi.getListeQuestionsJoueur1();
-                    defi.setEtat_jeu(1); 
+                    defi.setEtatJeu(1); 
                 }
                 int i = 1;
                 System.out.println(listeQuestions);
