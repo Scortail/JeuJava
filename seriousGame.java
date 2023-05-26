@@ -212,7 +212,7 @@ public class seriousGame {
         }
     }
     
-    public void menu_principal() {
+    public void menuPrincipal() {
         Login login = null;
         boolean start = true;
         while (start) {
