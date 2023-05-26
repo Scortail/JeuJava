@@ -10,7 +10,7 @@ public class Defi implements Serializable{
     private int etat; // -1 : refusé, 0 : en attente, 1 : accepté
     private ArrayList<Question> listeQuestionsJoueur1;
     private ArrayList<Question> listeQuestionsJoueur2;
-    private int etat_jeu; // -1 : personne n'a joué, 0 : J1 a joué, 1 : J2 a joué, 2 : defi terminé
+    private int etatJeu; // -1 : personne n'a joué, 0 : J1 a joué, 1 : J2 a joué, 2 : defi terminé
     private LocalDateTime creationTime;
 
     public Defi(Avatar joueur1, Avatar joueur2) {
