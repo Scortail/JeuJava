@@ -17,7 +17,7 @@ public class Defi implements Serializable{
         this.joueur1 = joueur1;
         this.joueur2 = joueur2;
         this.etat = 0;
-        this.etat_jeu = -1;
+        this.etatJeu = -1;
         this.listeQuestionsJoueur1 = new ArrayList<Question>();
         this.listeQuestionsJoueur2 = new ArrayList<Question>();
         this.creationTime = LocalDateTime.now();
@@ -36,8 +36,8 @@ public class Defi implements Serializable{
         return this.etat;
     }
 
-    public int getEtat_jeu() {
-        return this.etat_jeu;
+    public int getEtatJeu() {
+        return this.etatJeu;
     }
 
     public String getEtatDefi() {
@@ -47,7 +47,7 @@ public class Defi implements Serializable{
             case 0:
                 return "En attente";
             case 1:
-                switch (etat_jeu) {
+                switch (etatjeu) {
                     case -1:
                         return "Accepté";
                     case 0:
