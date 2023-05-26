@@ -73,9 +73,7 @@ public class Login implements Serializable {
     }
 
     // Permet a l'etudiant de s'identifier lors de l'inscription
-    public Etudiant getUserInfo() throws WrongInfoException, AvatarExistantException {
-
-        Scanner sc = new Scanner(System.in) ;
+    public Etudiant getUserInfo(Scanner sc) throws WrongInfoException, AvatarExistantException {
 
         System.out.println("Quel est votre nom");
         String nom = sc.nextLine();
@@ -96,9 +94,7 @@ public class Login implements Serializable {
         throw new WrongInfoException();
     }
 
-    protected void getUserPwd() throws WrongLoginException, WrongPwdException, WrongInputLengthException {
-
-        Scanner sc = new Scanner(System.in) ;
+    protected void getUserPwd(Scanner sc) throws WrongLoginException, WrongPwdException, WrongInputLengthException {
 
         System.out.println("Pseudo : ");
         login = sc.nextLine();
@@ -107,7 +103,6 @@ public class Login implements Serializable {
         password = sc.nextLine();
 
         Map<String, String> logins = chargerLogins();
-        System.out.println(logins);
 
         if (login.length() > 10 || password.length() > 10)
             throw new WrongInputLengthException();
@@ -120,12 +115,12 @@ public class Login implements Serializable {
     }
 
 
-    public void connexion(){
+    public void connexion(Scanner sc){
         boolean valide = false;
 
         while( !valide ){
             try {
-                getUserPwd();
+                getUserPwd(sc);
                 System.out.println("Login/password valides");
                 etudiant = trouveEtudiantConnecter();
                 valide = true;
@@ -149,9 +144,8 @@ public class Login implements Serializable {
         }
     }
 
-    public void getUserPwdIncrip() throws WrongInputLengthException, PseudoIndisponibleException {
+    public void getUserPwdIncrip(Scanner sc) throws WrongInputLengthException, PseudoIndisponibleException {
 
-        Scanner sc = new Scanner(System.in) ;
 
         System.out.println("Pseudo : ");
         login = sc.nextLine();
@@ -161,7 +155,6 @@ public class Login implements Serializable {
 
         Map<String, String> logins = chargerLogins();
 
-
         if (logins.containsKey(login))
             throw new PseudoIndisponibleException();
 
@@ -170,11 +163,11 @@ public class Login implements Serializable {
     }
 
 
-    public void creerCompte() {
+    public void creerCompte(Scanner sc) {
         boolean valide = false;
         while( !valide ){
             try {
-                getUserPwdIncrip();
+                getUserPwdIncrip(sc);
                 System.out.println("Compte créé!");
                         valide = true;
             }
@@ -193,13 +186,13 @@ public class Login implements Serializable {
         }
     }
 
-    public void inscription() {
+    public void inscription(Scanner sc) {
         Boolean inscription = false;
         while (!inscription) {
             try {
-                etudiant = getUserInfo();
+                etudiant = getUserInfo(sc);
                 System.out.println("Bienvenue");
-                creerCompte();
+                creerCompte(sc);
                 etudiant.creerAvatar(login);
                 Map<String, String> logins = chargerLogins();  // Charger les logins existants
                 logins.put(login, password);  // Ajouter le nouveau login et mot de passe

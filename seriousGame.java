@@ -1,7 +1,8 @@
 import java.util.*;
 
-
 public class seriousGame {
+    private static Scanner sc = new Scanner(System.in);
+
 
     class WrongOptionChoice extends Exception {
         public String toString() {
@@ -23,20 +24,18 @@ public class seriousGame {
     }
 
     public String userChoice() throws WrongOptionChoice{
-        Scanner sc = new Scanner(System.in) ;
 
         System.out.println("Choix : ");
         String choix = sc.nextLine();
-
-
+        
         if (!choix.equals("1") && !choix.equals("2") && !choix.equals("Q") && !choix.equals("q"))
             throw new WrongOptionChoice();
+
         return choix;
     }
 
     // Permet de trouver un avatar
     public Avatar getChoixAvatar() throws AvatarInexistantException{
-        Scanner sc = new Scanner(System.in) ;
 
         System.out.println("Qui voulez vous défier?");
         System.out.println(Avatar.afficherAvatars());
@@ -56,7 +55,6 @@ public class seriousGame {
 
     // Permet de choisir les questions à poser
     public ArrayList<Question> getChoixQuestions(Avatar avatar) throws NoValidQuestionException{
-        Scanner sc = new Scanner(System.in) ;
 
         System.out.println("Quelle question voulez vous poser : (mettre une virgule entre les numéro)");
         System.out.println(avatar.afficherQuestionsDispo());
@@ -82,11 +80,11 @@ public class seriousGame {
         return questionsChoisies;
     }
 
+    // Affiche les defis en cours d'un avatar
     private void afficherDefisEnCours(Avatar avatar) {
     System.out.println("Liste des défis en cours :");
     ArrayList<Defi> defis = avatar.getListeDefi();
     Defi defiChoisi = null;
-    Scanner sc = new Scanner(System.in);
     
     // Affichage des défis en cours
     for (int i = 0; i < defis.size(); i++) {
@@ -99,6 +97,7 @@ public class seriousGame {
             System.out.println("Joueur adversaire : " + defi.getJoueur1().getPseudo());
         }
         System.out.println("État du défi : " + defi.getEtat());
+        defi.afficherTempsRestant();
         System.out.println();
     }
     
@@ -150,7 +149,7 @@ public class seriousGame {
                         String choixParticiper = sc.nextLine();
                         
                         if (choixParticiper.equalsIgnoreCase("O")) { // Participer au défi
-                            avatar.jouer(defiChoisi);
+                            avatar.jouer(defiChoisi, sc);
                             choisirDefi = false;
                         } else if (choixParticiper.equalsIgnoreCase("N")) { // Ne pas participer au défi
                             choisirDefi = false;
@@ -240,13 +239,13 @@ public class seriousGame {
 
                 else if(choix.equals("2")) {
                     login = new Login();
-                    login.inscription();
+                    login.inscription(sc);
                     menu = false;
                 }
 
                 else if(choix.equals("1")) {
                     login = new Login();
-                    login.connexion();
+                    login.connexion(sc);
                     menu = false;
                 } 
             }

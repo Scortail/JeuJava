@@ -25,6 +25,7 @@ public class Admin extends Avatar {
 
         System.out.println("Nouveau pseudo : ");
         String newPseudo = sc.nextLine();
+        sc.close();
 
         if (chercherAvatar(newPseudo) != null)
             throw new PseudoDejaUtilise();

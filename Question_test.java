@@ -161,7 +161,7 @@ public class Question_test {
                 Question question20 = new Question("Quel célèbre compositeur autrichien a écrit La Flûte enchantée ?",
                                 choix_reponse20, 3, "Wolfgang Amadeus Mozart");
 
-                for (Question question : question1.chargerQuestions()) {
+                for (Question question : Question.chargerQuestions()) {
                         System.out.println(question);
                 }
     }

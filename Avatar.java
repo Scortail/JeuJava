@@ -138,10 +138,11 @@ public class Avatar implements Serializable{
     public void accepterDefi(Defi defi, Question ... questions) {
         if (this == defi.getJoueur2()) {
             defi.setEtat(1);
+            defi.setEtat_jeu(0);
             for ( Question question : questions) {
                 defi.ajouterQuestionJoueur2(question);
             }
-            System.out.println("Le défi a été accepté par " + pseudo);
+            System.out.println("Le défi a été accepté");
         } else {
             System.out.println("Vous ne pouvez pas accepter ce défi car vous n'êtes pas le joueur défié.");
         }
@@ -151,7 +152,14 @@ public class Avatar implements Serializable{
     public void refuserDefi(Defi defi) {
         if (this == defi.getJoueur2()) {
             defi.setEtat(-1);
-            System.out.println("Le défi a été refusé par " + pseudo);
+            // On applique un malus de 20%
+            double malus = 0;
+            for (Question question : defi.getListeQuestionsJoueur1()) {
+                malus += question.getNbPoints();
+            }
+            retirerVie(malus*0.2);
+            System.out.println("Le défi a été refusé");
+            System.out.println("Vous avez perdu " + malus*0.2 + " vies.");
         }
         else {
             System.out.println("Vous ne pouvez pas accepter ce défi car vous n'êtes pas le joueur défié.");
@@ -159,22 +167,37 @@ public class Avatar implements Serializable{
     }
     
     // 2 jours pour accepter puis 20 minutes pour jouer
-    public void jouer(Defi defi) {
+    public void jouer(Defi defi, Scanner sc) {
         ArrayList<Question> listeQuestions;
         if (listeDefi.contains(defi)) {
-            if (this.equals(defi.getJoueur1())) {
-                listeQuestions = defi.getListeQuestionsJoueur2();
+            if (defi.getEtat_jeu() == 2) {
+                System.out.println("Ce defi est terminé");
             }
-    
             else {
-                listeQuestions = defi.getListeQuestionsJoueur1();
-            }
-            int i = 1;
-            System.out.println(listeQuestions);
-            for (Question question : listeQuestions) {
-                System.out.println("Question " + i + " : ");
-                System.out.println(this.life);
-                defi.repondreQuestion(question, this);
+                if (this.equals(defi.getJoueur1())) {
+                    if (defi.getEtat_jeu() == 0) {
+                        System.out.println("Vous avez déjà jouer");
+                        return;
+                    }
+                    listeQuestions = defi.getListeQuestionsJoueur2();
+                    defi.setEtat_jeu(0);                
+                }
+                else {
+                    if (defi.getEtat_jeu() == 1) {
+                        System.out.println("Vous avez déjà jouer");
+                        return;
+                    }
+                    listeQuestions = defi.getListeQuestionsJoueur1();
+                    defi.setEtat_jeu(1); 
+                }
+                int i = 1;
+                System.out.println(listeQuestions);
+                for (Question question : listeQuestions) {
+                    System.out.println("Question " + i + " : ");
+                    System.out.println(life);
+                    defi.repondreQuestion(question, this, sc);
+                }
+                listeQuestions.clear();
             }
         }
         else {

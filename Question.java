@@ -93,7 +93,12 @@ public class Question implements Serializable{
     }
 
     public String toString() {
-        return this.intitule + " Choix : " + this.choixQuestion + " Difficulte : " + this.difficulte;
+        String choix = "";
+        for (int i=1; i<=getChoixReponse().size(); i++) { 
+            choix += i + " : " + getChoixReponse().get(i-1);
+        }
+
+        return this.intitule + " Choix : " + choix + " Difficulte : " + this.difficulte;
     }
 
     public boolean equals(Question question) {
