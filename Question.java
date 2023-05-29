@@ -1,11 +1,10 @@
 import java.util.ArrayList;
-import java.io.Serializable;
-import java.io.FileOutputStream;
-import java.io.ObjectOutputStream;
-import java.io.FileInputStream;
-import java.io.ObjectInputStream;
-import java.io.EOFException;
+import java.io.*;
 
+
+/**
+ * Représente une question avec son intitulé, les choix de réponse possibles, la difficulté et la réponse valide.
+ */
 public class Question implements Serializable{
     private String intitule;
     private ArrayList<String> choixQuestion;
@@ -13,7 +12,14 @@ public class Question implements Serializable{
     private String reponseValide;
 
 
-    // Quand on cree une question verifier la difficulte
+    /**
+     * Constructeur de la classe Question.
+     *
+     * @param intitule        l'intitulé de la question.
+     * @param choixQuestion   les choix de réponse possibles.
+     * @param difficulte      la difficulté de la question.
+     * @param reponseValide   la réponse valide.
+     */
     public Question(String intitule, ArrayList<String> choixQuestion, int difficulte, String reponseValide) {
         this.intitule = intitule;
         this.choixQuestion = choixQuestion;
@@ -29,22 +35,47 @@ public class Question implements Serializable{
         sauvegarderQuestions(questions); // sauvegarder la liste complète dans le fichier
     }
 
+    /**
+     * Retourne l'intitulé de la question.
+     *
+     * @return l'intitulé de la question.
+     */
     public String getIntitule() {
         return intitule;
     }
 
+    /**
+     * Retourne les choix de réponse possibles.
+     *
+     * @return les choix de réponse possibles.
+     */
     public ArrayList<String> getChoixReponse() {
         return choixQuestion;
     }
 
+    /**
+     * Retourne la difficulté de la question.
+     *
+     * @return la difficulté de la question.
+     */
     public int getDifficulte() {
         return difficulte;
     }
 
+    /**
+     * Retourne la réponse valide.
+     *
+     * @return la réponse valide.
+     */
     public String getReponseValide() {
         return reponseValide;
     }
 
+    /**
+     * Retourne le nombre de points associé à la difficulté de la question.
+     *
+     * @return le nombre de points associé à la difficulté de la question.
+     */
     public int getNbPoints() {
         switch (difficulte) {
         case 1:
@@ -60,21 +91,42 @@ public class Question implements Serializable{
         }
     }
 
+    /**
+     * Modifie l'intitulé de la question.
+     *
+     * @param intitule le nouvel intitulé de la question.
+     */
     public void setIntitule(String intitule) {
         this.intitule = intitule;
     }
 
+    /**
+     * Modifie la difficulté de la question.
+     *
+     * @param difficulte la nouvelle difficulté de la question.
+     */
     public void setNbPoints(int difficulte) {
         this.difficulte = difficulte;
         sauvegarderQuestion();
-        
+        sauvegarderQuestion();
     }
 
+    /**
+     * Modifie la réponse valide de la question.
+     *
+     * @param reponseValide la nouvelle réponse valide de la question.
+     */
     public void setReponseValide(String reponseValide) {
         this.reponseValide = reponseValide;
         sauvegarderQuestion();
     }
 
+    /**
+     * Vérifie si la réponse donnée correspond à la réponse valide de la question.
+     *
+     * @param reponse la réponse donnée.
+     * @return true si la réponse est valide, false sinon.
+     */
     public boolean verifReponse(String reponse) {
         if (reponse.equals(reponseValide)) {
             return true;
@@ -82,7 +134,13 @@ public class Question implements Serializable{
         return false;
     }
 
-    // Retourne la question rechercher
+    /**
+     * Cherche une question dans une liste de questions en utilisant son intitulé.
+     *
+     * @param questions la liste de questions.
+     * @param intitule  l'intitulé de la question à rechercher.
+     * @return la question recherchée, ou null si elle n'est pas trouvée.
+     */
     public Question chercherQuestion(ArrayList<Question> questions, String intitule) {
         for (Question question : questions) {
             if (intitule.equals(question.getIntitule())) {
@@ -92,15 +150,27 @@ public class Question implements Serializable{
         return null;
     }
 
+    /**
+     * Retourne une représentation sous forme de chaîne de caractères de la question.
+     *
+     * @return la représentation de la question en tant que chaîne de caractères.
+     */
+    @Override
     public String toString() {
         String choix = "";
         for (int i=1; i<=getChoixReponse().size(); i++) { 
-            choix += i + " : " + getChoixReponse().get(i-1);
+            choix += i + " : " + getChoixReponse().get(i-1)+ "\n";
         }
 
-        return this.intitule + " Choix : " + choix + " Difficulte : " + this.difficulte;
+        return this.intitule + " Difficulte : " + this.difficulte + "\n" + choix;
     }
 
+    /**
+     * Vérifie si une question est égale à cette question en comparant leurs intitulés.
+     *
+     * @param question la question à comparer.
+     * @return true si les questions sont égales, false sinon.
+     */
     public boolean equals(Question question) {
         if (this.intitule.equals(question.intitule)) {
             return true;
@@ -108,7 +178,11 @@ public class Question implements Serializable{
         return false;
     }
 
-    // Écrit toutes les questions dans un nouveau fichier
+    /**
+     * Sauvegarde toutes les questions dans un fichier.
+     *
+     * @param questions la liste de questions à sauvegarder.
+     */
     public static void sauvegarderQuestions(ArrayList<Question> questions) {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("questions.ser"))) {
             for (Question question : questions) {
@@ -119,7 +193,11 @@ public class Question implements Serializable{
         }
     }
     
-    // Charge tous les questions depuis le fichier
+    /**
+     * Charge toutes les questions à partir du fichier.
+     *
+     * @return la liste des questions chargées.
+     */
     public static ArrayList<Question> chargerQuestions() {
         ArrayList<Question> questions = new ArrayList<>();
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("questions.ser"))) {
@@ -139,7 +217,10 @@ public class Question implements Serializable{
         return questions;
     }
 
-    // Nous permet de sauvegarder une question
+    /**
+     * Sauvegarde la question actuelle en remplaçant une question existante avec le même intitulé, ou l'ajoute à la liste
+     * des questions si elle n'existe pas encore.
+     */
     public void sauvegarderQuestion() {
         ArrayList<Question> listeQuestions = chargerQuestions();
         Question question = chercherQuestion(listeQuestions, intitule);

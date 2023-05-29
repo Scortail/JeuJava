@@ -1,6 +1,8 @@
+import java.util.*;
 
 public class Etudiant_test {
     public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
         Etudiant etudiant1 = new Etudiant("Beaurain", "Tom");
         Etudiant etudiant2 = new Etudiant("Devaux", "Clement");
         Matiere maths = new Matiere("Maths");
@@ -12,6 +14,7 @@ public class Etudiant_test {
         etudiant1.ajouterNote(maths, 15);
         etudiant2.ajouterNote(maths, 17);
         etudiant2.ajouterNote(physique, 12);
+
         // System.out.println(etudiant2.getNotes());
 
         // System.out.println(etudiant1.getNotes());

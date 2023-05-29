@@ -1,59 +1,86 @@
 import java.util.*;
 
+/**
+ * Cette classe représente un serious game.
+ * Elle permet de gérer les différentes fonctionnalités du jeu, telles que l'administration, le jeu lui-même, la sélection d'avatar, etc.
+ */
 public class seriousGame {
     private static Scanner sc = new Scanner(System.in);
 
-
+    /**
+     * Exception levée lorsque le choix de l'utilisateur n'est pas valide.
+     */
     class WrongOptionChoice extends Exception {
         public String toString() {
             return "Ce choix n'est pas possible";
         }
     }
 
-
+    /**
+     * Exception levée lorsqu'un avatar recherché n'existe pas.
+     */
     class AvatarInexistantException extends Exception {
         public String toString() {
             return "Le pseudo recherché n'existe pas, veuillez réessayez.";
         }
     }
 
+    /**
+     * Exception levée lorsqu'aucune question valide n'est entrée.
+     */
     class NoValidQuestionException extends Exception {
         public String toString() {
             return "Erreur : vous n'avez entrez aucune question valide.";
         }
     }
 
-    public String userChoice() throws WrongOptionChoice{
-
+    /**
+     * Méthode permettant à l'utilisateur de faire un choix parmi une liste d'options possibles.
+     * @param choixPossibles La liste des options possibles.
+     * @return Le choix de l'utilisateur.
+     * @throws WrongOptionChoice Exception levée si le choix de l'utilisateur n'est pas valide.
+     */
+    public String userChoice(List<String> choixPossibles) throws WrongOptionChoice {
         System.out.println("Choix : ");
         String choix = sc.nextLine();
-        
-        if (!choix.equals("1") && !choix.equals("2") && !choix.equals("Q") && !choix.equals("q"))
+
+        if (!choixPossibles.contains(choix))
             throw new WrongOptionChoice();
 
         return choix;
     }
 
-    // Permet de trouver un avatar
-    public Avatar getChoixAvatar() throws AvatarInexistantException{
-
-        System.out.println("Qui voulez vous défier?");
-        System.out.println(Avatar.afficherAvatars());
+    /**
+     * Méthode permettant de choisir un avatar parmi ceux disponibles.
+     * @param joueur L'avatar du joueur actuel.
+     * @return L'avatar choisi par le joueur.
+     * @throws AvatarInexistantException Exception levée si le pseudo recherché n'existe pas.
+     */
+    public Avatar getChoixAvatar(Avatar joueur) throws AvatarInexistantException{
+        System.out.println(joueur.afficherAvatars());
         System.out.println("Pseudo : ");
         String pseudo = sc.nextLine();
-        ArrayList<Etudiant> listeEtudiants = Etudiant.chargerEtudiant();
-        for (Etudiant etudiant : listeEtudiants) {
-            Avatar avatar = etudiant.getAvatar();
-            if (!(etudiant.getAvatar() == null)) {
-                if (avatar.getPseudo().equals(pseudo)) {
-                    return avatar;
-                }
-            }          
+        ArrayList<Object> utilisateurs = Etudiant.chargerUtilisateurs();
+        for (Object utilisateur : utilisateurs) {
+            if (utilisateur instanceof Etudiant) {
+                Etudiant etudiant = (Etudiant) utilisateur;
+                Avatar avatar = etudiant.getAvatar();
+                if (!(etudiant.getAvatar() == null)) {
+                    if (avatar.getPseudo().equals(pseudo)) {
+                        return avatar;
+                    }
+                }    
+            }      
         }
         throw new AvatarInexistantException();
         }
 
-    // Permet de choisir les questions à poser
+    /**
+     * Méthode permettant de choisir les questions à poser.
+     * @param avatar L'avatar pour lequel choisir les questions.
+     * @return La liste des questions choisies.
+     * @throws NoValidQuestionException Exception levée si aucune question valide n'est entrée.
+     */
     public ArrayList<Question> getChoixQuestions(Avatar avatar) throws NoValidQuestionException{
 
         System.out.println("Quelle question voulez vous poser : (mettre une virgule entre les numéro)");
@@ -80,7 +107,10 @@ public class seriousGame {
         return questionsChoisies;
     }
 
-    // Affiche les defis en cours d'un avatar
+    /**
+     * Méthode permettant d'afficher les défis en cours d'un avatar.
+     * @param avatar L'avatar pour lequel afficher les défis en cours.
+     */
     private void afficherDefisEnCours(Avatar avatar) {
     System.out.println("Liste des défis en cours :");
     ArrayList<Defi> defis = avatar.getListeDefi();
@@ -165,11 +195,95 @@ public class seriousGame {
             }
         }
     }
-}
+    }
 
+    /**
+     * Méthode gérant le menu d'administration du jeu.
+     * @param admin L'administrateur du jeu.
+     */
+    public void menuAdministration(Admin admin) {
+        boolean play = true;
+        while (play) {
+            Boolean valide = false;
+            String choix = null;
+            while (!valide) {
+                try {
+                    List<String> optionsMenu = Arrays.asList("1", "2", "Q", "q");
+                    System.out.println("Taper 1 pour administrer");
+                    System.out.println("Taper 2 pour jouer");
+                    System.out.println("Taper Q pour quitter");
+                    choix = userChoice(optionsMenu);
+                    valide = true;
+                } catch (WrongOptionChoice woc) {
+                    woc.printStackTrace();
+                }
+            }
+            if (choix.equals("Q") || choix.equals("q")) {
+                play = false;
 
-    public void play(Login login) {
-        Avatar avatar = login.getEtudiant().getAvatar();
+            } else if (choix.equals("1")) { // Condition pour pouvoir administrer le jeu
+                administration(admin);
+
+            } else if (choix.equals("2")) { // Condition pour pouvoir jouer au jeu
+                play(admin);
+            }
+        }
+    }
+
+    /**
+     * Méthode gérant l'administration du jeu.
+     * @param admin L'administrateur du jeu.
+     */
+    public void administration(Admin admin) {
+        boolean play = true;
+        while (play) {
+            Boolean valide = false;
+            String choix = null;
+            while (!valide) {
+                try {
+                    List<String> optionsMenu = Arrays.asList("1", "2", "3", "Q", "q");
+                    System.out.println("Taper 1 pour voir les nouvelles questions proposer");
+                    System.out.println("Taper 2 acceder au demande de modification de pseudo");
+                    System.out.println("Taper 3 pour supprimer un avatar");
+                    System.out.println("Taper Q pour quitter");
+                    choix = userChoice(optionsMenu);
+                    valide = true;
+                } catch (WrongOptionChoice woc) {
+                    woc.printStackTrace();
+                }
+            }
+            if (choix.equals("Q") || choix.equals("q")) {
+                play = false;
+
+            } else if (choix.equals("1")) { // Gerer les nouvelles questions
+                admin.choisirQuestion(sc);
+
+            } else if (choix.equals("2")) { // Modifier un pseudo
+                admin.choixModificationAvatar(sc);
+                
+
+            } else if (choix.equals("3")) { // Supprimer un avatar
+                Avatar avatar_supprimer = null;
+                valide = false;
+                while (!valide) {
+                    try {
+                        System.out.println("Qui voulez vous supprimer ?");
+                        avatar_supprimer = getChoixAvatar(admin);
+                        valide = true;
+                    } catch (AvatarInexistantException aie) {
+                        aie.printStackTrace();
+                }
+                admin.supprimerAvatar(avatar_supprimer);
+                }
+            }
+        }
+    }
+
+    /**
+     * Méthode gérant le déroulement du jeu pour un avatar donné.
+     * @param avatar L'avatar pour lequel jouer.
+     */
+    public void play(Avatar avatar) {
         System.out.println("Bonjour " + avatar.getPseudo());
         boolean play = true;
         while (play) {
@@ -177,10 +291,14 @@ public class seriousGame {
             String choix = null;
             while (!valide) {
                 try {
+                    List<String> optionsMenu = Arrays.asList("1", "2", "3", "Q", "q");
                     System.out.println("Taper 1 pour voir les défis en cours");
                     System.out.println("Taper 2 pour défier un avatar");
+                    System.out.println("Taper 3 pour passer un test");
+                    System.out.println("Taper 4 pour proposer de nouvelles questions");
+                    System.out.println("Taper 5 pour changer de pseudo");
                     System.out.println("Taper Q pour quitter");
-                    choix = userChoice();
+                    choix = userChoice(optionsMenu);
                     valide = true;
                 } catch (WrongOptionChoice woc) {
                     woc.printStackTrace();
@@ -192,13 +310,14 @@ public class seriousGame {
             } else if (choix.equals("1")) { // Ajout de la condition pour afficher les défis en cours
                 afficherDefisEnCours(avatar);
 
-            } else if (choix.equals("2")) {
+            } else if (choix.equals("2")) { // Defier un avatar
                 valide = false;
                 Avatar avatar_defier = null;
                 ArrayList<Question> listeQuestions = null;
                 while (!valide) {
                     try {
-                        avatar_defier = getChoixAvatar();
+                        System.out.println("Qui voulez vous défier?");
+                        avatar_defier = getChoixAvatar(avatar);
                         listeQuestions = getChoixQuestions(avatar);
                         valide = true;
                     } catch (AvatarInexistantException aie) {
@@ -208,10 +327,21 @@ public class seriousGame {
                     }
                 }
                 avatar.creerDefi(avatar_defier, listeQuestions.toArray(new Question[listeQuestions.size()]));
+            } else if (choix.equals("3")) {
+                avatar.jouerTest(sc);
+            }
+            else if (choix.equals("4")) {
+                avatar.soumettreQuestion(sc);
+            }
+            else if (choix.equals("5")) {
+                avatar.changerPseudo(sc);
             }
         }
     }
     
+    /**
+     * Méthode gérant le menu principal du jeu.
+     */
     public void menu_principal() {
         Login login = null;
         boolean start = true;
@@ -222,34 +352,48 @@ public class seriousGame {
                 String choix = null;
                 while (!valide) {
                     try {
+                        List<String> optionsMenu = Arrays.asList("1", "2", "Q", "q");
                         System.out.println("Bienvenue dans le serious game");
                         System.out.println("Taper 1 pour vous identifier");
                         System.out.println("Taper 2 pour vous inscrire");
                         System.out.println("Taper Q pour quitter");
-                        choix = userChoice();
+                        choix = userChoice(optionsMenu);
                         valide = true;
                     } catch (WrongOptionChoice woc) {
                         woc.printStackTrace();
                     }
                 }
                 if (choix.equals("Q") || choix.equals("q")) {
-                    menu = false;
-                    start = false;
+                    return;
                 }
-
                 else if(choix.equals("2")) {
                     login = new Login();
                     login.inscription(sc);
                     menu = false;
                 }
-
                 else if(choix.equals("1")) {
                     login = new Login();
                     login.connexion(sc);
                     menu = false;
-                } 
+                }
             }
-            play(login);
+            // admin connecté
+            if (login.getEtudiant() == null) {
+                // On récupère l'admin
+                ArrayList<Object> utilisateurs = Etudiant.chargerUtilisateurs();
+                for (Object utilisateur : utilisateurs) {
+                    if (utilisateur instanceof Admin) {
+                        Admin admin = (Admin) utilisateur;
+                        if (login.getLogin().equals(admin.getPseudo()))
+                            menuAdministration(admin);
+                    }
+                }
+            }
+            // Joueur connecté
+            else {
+                Avatar avatar = login.getEtudiant().getAvatar();
+                play(avatar);
+            }      
             menu = true;
         }
     }

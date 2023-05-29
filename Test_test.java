@@ -1,18 +1,29 @@
-public class Main {
+import java.util.Scanner;
+
+public class Test_test {
     public static void main(String[] args) {
-        // Création d'un avatar pour le joueur
-        Avatar joueur = new Avatar("Nom du joueur");
+        // Création d'un joueur
+        Avatar joueur = new Avatar("test", 10);
 
-        // Chargement des questions depuis la base existante
-        ArrayList<Question> baseQuestions = Question.chargerQuestions();
-
-        // Création d'un test
+        // Création d'un test avec le joueur
         Test test = new Test(joueur);
 
-        // Génération de 5 questions aléatoires à partir de la base
-        test.genererQuestionsAleatoires(baseQuestions, 5);
+        // Affichage des questions du test
+        System.out.println("Questions du test :");
+        for (Question question : test.getListeQuestions()) {
+            System.out.println(question);
+        }
 
-        // Jouer le test
-        test.jouerTest();
+        // Scanner pour lire les réponses du joueur
+        Scanner scanner = new Scanner(System.in);
+
+        // Répondre aux questions du test
+        for (Question question : test.getListeQuestions()) {
+            test.repondreQuestion(question, joueur, scanner);
+        }
+
+        // Affichage du score final
+        System.out.println("Score final : " + test.getScore());
     }
 }
+
